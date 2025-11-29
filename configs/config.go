@@ -7,8 +7,10 @@ import (
 )
 
 type ConfigType struct {
-	Port           int
-	Prefix         string
+	Port      int
+	Prefix    string
+	StaticDir string `yaml:"staticDir"`
+
 	LogDir         string `yaml:"logDir"`
 	LogReserveTime int    `yaml:"logReserveTime"`
 
@@ -21,6 +23,7 @@ var Config ConfigType
 const template = `
 prefix: "/trail"  # 路由前缀
 port: 9528  # 启动端口
+staticDir: "static"  # 前端静态页面
 
 logDir: "./logs"        # 日志目录
 logReserveTime: 30  # 日志保留时间(d)

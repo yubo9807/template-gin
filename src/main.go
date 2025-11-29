@@ -28,6 +28,13 @@ func server() *gin.Engine {
 	router.Basic(self.Group("/basic/api"))
 	router.V1(self.Group("/v1/api"))
 
+	// 前端静态文件
+	staticPrefix := configs.Config.StaticDir
+	middleware.Static(app, staticPrefix)
+	app.GET("/", func(ctx *gin.Context) {
+		ctx.Redirect(301, staticPrefix+"/")
+	})
+
 	return app
 }
 

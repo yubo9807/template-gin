@@ -1,20 +1,23 @@
 package user
 
 import (
+	"server/src/middleware"
 	"server/src/service"
 
 	"github.com/gin-gonic/gin"
 )
 
 // 登录
-func SignIn(ctx *gin.Context) {
+func SignIn(c *gin.Context) {
+	ctx := middleware.ContextGet(c)
+
 	type Params struct {
 		Username string `binding:"required"`
 		Password string `binding:"required"`
 	}
 	var params Params
 	if err := ctx.ShouldBind(&params); err != nil {
-		service.State.ErrorParams(ctx)
+		ctx.ErrorParams(err.Error())
 		return
 	}
 
@@ -27,5 +30,5 @@ func SignIn(ctx *gin.Context) {
 		"username": params.Username,
 	}
 	token := service.Jwt.Publish(info)
-	service.State.SuccessData(ctx, token)
+	ctx.SuccessData(token)
 }

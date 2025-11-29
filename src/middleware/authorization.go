@@ -8,10 +8,12 @@ import (
 
 const KEY = "user_info"
 
-func Authorization(ctx *gin.Context) {
+func Authorization(c *gin.Context) {
+	ctx := ContextGet(c)
+
 	auth := ctx.GetHeader("Authorization")
 	if auth == "" {
-		service.State.ErrorUnauthorized(ctx, "Unauthorized")
+		ctx.ErrorAuth("Unauthorized")
 		ctx.Abort()
 		return
 	}
@@ -20,9 +22,9 @@ func Authorization(ctx *gin.Context) {
 	if err != nil {
 		if err.Error() == "Token is expired" {
 			// 可尝试刷新 token
-			service.State.ErrorTokenFailure(ctx)
+			ctx.ErrorAuth(err.Error())
 		} else {
-			service.State.ErrorUnauthorized(ctx, err.Error())
+			ctx.ErrorAuth(err.Error())
 		}
 		ctx.Abort()
 		return
@@ -38,10 +40,11 @@ func GetTokenInfo(ctx *gin.Context) map[string]interface{} {
 
 // 角色校验
 func RoleVerify(roleId string) gin.HandlerFunc {
-	return func(ctx *gin.Context) {
-		info := GetTokenInfo(ctx)
+	return func(c *gin.Context) {
+		info := GetTokenInfo(c)
+		ctx := ContextGet(c)
 		if info["roleId"] != roleId {
-			service.State.ErrorCustom(ctx, "The current user has no permission")
+			ctx.ErrorCustom("The current user has no permission")
 			return
 		}
 	}
